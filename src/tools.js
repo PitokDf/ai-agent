@@ -288,10 +288,11 @@ async function runWeather(city, days = 1) {
 
 async function runStock(symbol) {
   const sym = symbol.toUpperCase();
+  const proxyUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/yahoo-finance`;
   try {
     const res = await fetch(
-      `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?interval=1d&range=1d`,
-      { signal: AbortSignal.timeout(8000) }
+      `${proxyUrl}?symbol=${encodeURIComponent(sym)}`,
+      { signal: AbortSignal.timeout(10000) }
     );
     if (res.ok) {
       const data = await res.json();
@@ -313,23 +314,10 @@ async function runStock(symbol) {
     }
   } catch (_) { }
 
-  const MOCK = {
-    AAPL: { name: "Apple Inc.", price: 189.43, prev: 188.19, currency: "USD" },
-    MSFT: { name: "Microsoft Corp.", price: 415.22, prev: 417.37, currency: "USD" },
-    GOOGL: { name: "Alphabet Inc.", price: 178.90, prev: 176.55, currency: "USD" },
-    BBCA: { name: "Bank Central Asia", price: 9850, prev: 9700, currency: "IDR" },
-    GOTO: { name: "GoTo Gojek Tokopedia", price: 65, prev: 67, currency: "IDR" },
-    TLKM: { name: "Telkom Indonesia", price: 3180, prev: 3200, currency: "IDR" },
-  };
-  const base = sym.split(".")[0];
-  const d = MOCK[base] || { name: sym, price: 100, prev: 98, currency: "USD" };
-  const change = d.price - d.prev;
   return {
-    type: "stock", symbol: sym, name: d.name,
-    price: d.price.toFixed(2), change: change.toFixed(2),
-    percent: ((change / d.prev) * 100).toFixed(2),
-    currency: d.currency,
-    note: "Live data unavailable; showing cached/mock data",
+    type: "stock",
+    symbol: sym,
+    error: "Could not fetch stock data. Check the symbol (e.g. BBCA.JK for IDX stocks, AAPL for US stocks).",
     timestamp: new Date().toISOString(),
   };
 }
