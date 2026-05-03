@@ -83,16 +83,6 @@ export const API_PROVIDERS = [
   { value: 'cloudflare', label: 'Cloudflare AI',    group: 'Cloud',   url: 'https://developers.cloudflare.com/workers-ai', note: 'No tools' },
 ]
 
-export const CLOUDFLARE_MODELS = [
-  '@cf/meta/llama-3.3-70b-instruct-fp8-fast',
-  '@cf/meta/llama-3-8b-instruct',
-  '@cf/meta/llama-3-70b-instruct',
-  '@cf/mistral/mistral-7b-instruct-v0.1',
-  '@cf/google/gemma-7b-it',
-  '@cf/qwen/qwen1.5-7b-chat-awq',
-  '@cf/microsoft/phi-2',
-]
-
 // ─── Built-in skills ──────────────────────────────────────────────────────────
 
 export const BUILTIN_SKILLS = [

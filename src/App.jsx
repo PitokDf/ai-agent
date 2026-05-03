@@ -97,7 +97,8 @@ export default function App() {
       } else if (provider === 'google') {
         endpoint = `${config.apiUrl.replace(/\/$/, "")}/models?key=${config.apiKey}`
       } else if (provider === 'cloudflare') {
-        endpoint = `${config.apiUrl.replace(/\/$/, "")}/accounts/${config.accountId}/ai/models/search?search=llama`
+        if (!config.accountId || !config.apiKey) return setConnected(false)
+        endpoint = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/cloudflare-ai/models?accountId=${config.accountId}`
         headers['Authorization'] = `Bearer ${config.apiKey}`
       } else if (provider === 'anthropic') {
         endpoint = `${config.apiUrl.replace(/\/$/, "")}/models`

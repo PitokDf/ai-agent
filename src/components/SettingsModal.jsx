@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { X, Trash2, Settings2, RefreshCw, AlertCircle, ExternalLink } from 'lucide-react'
-import { saveSettings, API_PROVIDERS, CLOUDFLARE_MODELS } from '../settings.js'
+import { X, Trash2, Settings2, RefreshCw, CircleAlert as AlertCircle, ExternalLink } from 'lucide-react'
+import { saveSettings, API_PROVIDERS } from '../settings.js'
 
 const EMPTY_TOOL = { name: '', description: '', parameters: {}, required: [] }
 
@@ -52,7 +52,15 @@ export default function SettingsModal({ settings, onUpdate, onClose }) {
     setLoadingModels(true)
     try {
       if (activeProvider === 'cloudflare') {
-        setModels(CLOUDFLARE_MODELS)
+        if (!config.accountId || !config.apiKey) { setLoadingModels(false); return }
+        const proxyUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/cloudflare-ai/models`
+        const res = await fetch(`${proxyUrl}?accountId=${encodeURIComponent(config.accountId)}`, {
+          headers: { Authorization: `Bearer ${config.apiKey}` },
+          signal: AbortSignal.timeout(6000),
+        })
+        if (!res.ok) throw new Error(`Cloudflare: ${res.status}`)
+        const data = await res.json()
+        setModels(data.data || [])
         return
       }
       if (activeProvider === 'lmstudio' || activeProvider === 'jan') {

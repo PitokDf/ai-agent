@@ -100,10 +100,18 @@ function buildRequest(provider, config, history, tools, settings, stream) {
     };
   }
   if (provider === "cloudflare") {
+    const proxyUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/cloudflare-ai`;
     return {
-      endpoint: `${config.apiUrl.replace(/\/$/, "")}/accounts/${config.accountId}/ai/run/${config.model}`,
+      endpoint: `${proxyUrl}/chat`,
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${config.apiKey}` },
-      body: { messages: history.map(m => ({ role: m.role, content: m.content ?? "" })), max_tokens: settings.maxTokens, stream: false },
+      body: {
+        accountId: config.accountId,
+        model: config.model,
+        messages: history.map(m => ({ role: m.role === "model" ? "assistant" : m.role, content: m.content ?? "" })),
+        max_tokens: settings.maxTokens,
+        stream,
+        temperature: settings.temperature,
+      },
     };
   }
   return {
@@ -220,7 +228,10 @@ function parseNonStream(provider, data) {
       toolCalls: parts.filter(p => p.functionCall).map((p, i) => ({ id: `call_${Date.now()}_${i}`, function: { name: p.functionCall.name, arguments: p.functionCall.args } })),
     };
   }
-  if (provider === "cloudflare") return { content: data.result?.response ?? "" };
+  if (provider === "cloudflare") {
+    const msg = data.choices?.[0]?.message;
+    return { content: msg?.content ?? "" };
+  }
   const msg = data.choices?.[0]?.message;
   return { content: msg?.content ?? "", toolCalls: msg?.tool_calls?.length ? msg.tool_calls : undefined };
 }
@@ -262,7 +273,7 @@ export async function runAgentLoop({ messages, settings, uploadedFiles = {}, sta
 
   for (let round = 0; round < MAX_ROUNDS; round++) {
     onStreamReset?.();
-    const stream = streamingEnabled && provider !== "cloudflare";
+    const stream = streamingEnabled;
     const req = buildRequest(provider, config, history, allTools, settings, stream);
 
     try {
