@@ -47,6 +47,7 @@ const thinkingToggleBtn = { display: 'flex', alignItems: 'center', justifyConten
 const thinkingIconWrap = { width: 22, height: 22, borderRadius: 6, background: 'rgba(168,85,247,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }
 const thinkingLabel = { fontSize: 12, fontWeight: 600, color: 'var(--thinking-accent)', letterSpacing: '-0.01em' }
 const wordBadge = { fontSize: 10, fontFamily: 'var(--mono)', color: 'var(--thinking-accent)', opacity: 0.7, background: 'rgba(168,85,247,0.12)', padding: '1px 6px', borderRadius: 99 }
+const thinkingHeader = { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '9px 12px' }
 const thinkingStreamBody = { padding: '0 12px 10px', borderTop: '1px solid rgba(168,85,247,0.2)', marginTop: 0, maxHeight: 200, overflowY: 'auto' }
 const reasoningOpenBody = { padding: '10px 12px 12px', borderTop: '1px solid rgba(168,85,247,0.2)' }
 const waveDotWrap = { display: 'flex', alignItems: 'center', gap: 3, marginLeft: 4 }
